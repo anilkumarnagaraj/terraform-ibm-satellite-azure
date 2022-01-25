@@ -1,37 +1,8 @@
-# IBM Cloud Satellite location on Azure
+# satellite-azure
 
-Use this terrafrom automation to set up satellite location on IBM cloud with azure host.
+This example cover end-to-end functionality of IBM cloud satellite by creating satellite location on specified region.
 It will provision satellite location and create 6 azure host and assign 3 host to control plane, and provision ROKS satellite cluster and auto assign 3 host to cluster,
 Configure cluster worker pool to an existing ROKS satellite cluster.
-
-This is a collection of modules that make it easier to provision a satellite on IBM Cloud.
-* satellite-location
-* satellite-assign-host
-* satellite-cluster
-* satellite-cluster-worker-pool
-
-## Overview
-
-IBM Cloud® Satellite helps you deploy and run applications consistently across all on-premises, edge computing and public cloud environments from any cloud vendor. It standardizes a core set of Kubernetes, data, AI and security services to be centrally managed as a service by IBM Cloud, with full visibility across all environments through a single pane of glass. The result is greater developer productivity and development velocity.
-
-https://cloud.ibm.com/docs/satellite?topic=satellite-getting-started
-
-## Features
-
-- Create satellite location.
-- Create 6 azure host with RHEL 7-LVM.
-- Assign the 3 hosts to the location control plane.
-- *Conditional creation*:
-  * Create a Red Hat OpenShift on IBM Cloud cluster and assign the 3 hosts to the cluster, so that you can run OpenShift workloads in your location.
-  * Configure a worker pool to an existing OpenShift Cluster.
-
-<table cellspacing="10" border="0">
-  <tr>
-    <td>
-      <img src="images/providers/satellite.png" />
-    </td>
-  </tr>
-</table>
 
 ## Compatibility
 
@@ -56,6 +27,7 @@ Be sure you have the correct Terraform version ( 0.13 or later), you can choose 
 Be sure you have the compiled plugins on $HOME/.terraform.d/plugins/
 
 - [terraform-provider-ibm](https://github.com/IBM-Cloud/terraform-provider-ibm)
+
 ## Usage
 
 ```
@@ -72,7 +44,6 @@ terraform destroy
 ```
 
 ## Example Usage
-
 ``` hcl
 
 provider "azurerm" {
@@ -142,9 +113,9 @@ module "satellite-azure" {
 | ibm_resource_group                    | Resource Group Name that has to be targeted.                      | string   | n/a     | yes      |
 | az_subscription_id                    | Subscription id of Azure Account                                  | string   | n/a     | yes      |
 | az_client_id                          | Client id of Azure Account                                        | string   | n/a     | yes      |
-| az_tenant_id                          | Tenent id of Azure Account                                        | string   | n/a     | yes   |
+| az_tenant_id                          | Tenent id of Azure Account                                        | string   | n/a     | yes      |
 | az_client_secret                      | Client Secret of Azure Account                                    | string   | n/a     | yes      |
-| is_az_resource_group_exist            | "If false, resource group (az_resource_group) will be created. If true, existing resource group (az_resource_group) will be read"| bool   | false  | no   |
+| is_az_resource_group_exist            | "If false, resource group (az_resource_group) will be created. If true, existing resource group (az_resource_group) will be read"| bool   | true  | no   |
 | az_resource_group                     | Azure Resource Group                                              | string  | satellite-azure  | no   |
 | az_region                             | Azure Region                                                      | string   | eastus  | yes   |
 | location                              | Name of the Location that has to be created                       | string   | n/a     | satellite-azure  |
@@ -155,10 +126,12 @@ module "satellite-azure" {
 | location_bucket                       | COS bucket name                                                   | string   | n/a     | no       |
 | host_count                            | The total number of host to create for control plane. host_count value should always be in multiples of 3, such as 3, 6, 9, or 12 hosts | number | 3 |  yes |
 | addl_host_count                       | The total number of additional host                               | number   | 3       | no       |
+| host_provider                         | The cloud provider of host/vms.                                   | string   | azure     | no       |
 | resource_prefix                       | Prefix to the Names of all VSI Resources                          | string   | satellite-azure | no|
 | public_key                            | Public SSH key used to provision Host/VSI                         | string   | n/a     | no       |
 | location_instance_type                | Profile information of location hosts                             | string   | Standard_D4s_v3| no     |
-| cluster_instance_type                 | Profile information of cluster hosts                              | string   | Standard_D4s_v3| no     || create_cluster                        | Create cluster                                                    | bool     | true    | no       |
+| cluster_instance_type                 | Profile information of cluster hosts                              | string   | Standard_D4s_v3| no     |
+| create_cluster                        | Create cluster                                                    | bool     | true    | no       |
 | cluster                               | Name of the ROKS Cluster that has to be created                   | string   | n/a     | yes      |
 | cluster_zones                         | Allocate your hosts across these three zones                      | set      | n/a     | yes      |
 | kube_version                          | Kuber version                                                     | string   | 4.7_openshift | no |
@@ -191,29 +164,3 @@ module "satellite-azure" {
 | cluster_worker_pool_id      | Cluster worker pool id                |
 | worker_pool_worker_count    | worker count deatails                 |
 | worker_pool_zones           | workerpool zones                      |
-
-## Pre-commit Hooks
-
-Run the following command to execute the pre-commit hooks defined in `.pre-commit-config.yaml` file
-
-  `pre-commit run -a`
-
-We can install pre-coomit tool using
-
-  `pip install pre-commit`
-
-## How to input varaible values through a file
-
-To review the plan for the configuration defined (no resources actually provisioned)
-
-`terraform plan -var-file=./input.tfvars`
-
-To execute and start building the configuration defined in the plan (provisions resources)
-
-`terraform apply -var-file=./input.tfvars`
-
-To destroy the VPC and all related resources
-
-`terraform destroy -var-file=./input.tfvars`
-
-All optional parameters by default will be set to null in respective example's varaible.tf file. If user wants to configure any optional paramter he has overwrite the default value.

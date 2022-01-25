@@ -1,3 +1,8 @@
+#####################################################
+# IBM Cloud Satellite -  Azure
+# Copyright 2022 IBM
+#####################################################
+
 # ##################################################
 # # Azure and IBM Authentication Variables
 # ##################################################
@@ -72,6 +77,18 @@ variable "ssh_public_key" {
   default     = null
 }
 
+variable "location_instance_type" {
+  description = "The type of azure instance to create"
+  type        = string
+  default     = "Standard_D4s_v3"
+}
+
+variable "cluster_instance_type" {
+  description = "The type of azure instance to create"
+  type        = string
+  default     = "Standard_D4s_v3"
+}
+
 variable "satellite_host_count" {
   description = "The total number of Azure host to create for control plane. "
   type        = number
@@ -86,18 +103,6 @@ variable "addl_host_count" {
   description = "The total number of additional azure vm's"
   type        = number
   default     = 0
-}
-
-variable "location_instance_type" {
-  description = "The type of azure instance to create"
-  type        = string
-  default     = "Standard_D4s_v3"
-}
-
-variable "cluster_instance_type" {
-  description = "The type of azure instance to create"
-  type        = string
-  default     = "Standard_D4s_v3"
 }
 
 # ##################################################
